@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Validator;
 
 class SeatsController extends Controller
 {
+    /**
+     * Display a listing of available seats for a specific showtime.
+     *
+     * @param int $showtimesId
+     * @return \Illuminate\Http\Response
+     */
     public function index($showtimeId)
     {
         $showtime = Showtimes::with('seats')->find($showtimeId);
@@ -26,6 +32,12 @@ class SeatsController extends Controller
         ]);
     }
 
+    /**
+     * Reserve seats for a specific showtime.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -54,6 +66,13 @@ class SeatsController extends Controller
             'reserved_seats' => $seatsId,
         ]);
     }
+
+    /**
+     * Create a booking for reserved seats.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function book(Request $request)
     {
         $validator = Validator::make($request->all(), [

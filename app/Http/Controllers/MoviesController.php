@@ -3,32 +3,45 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use App\Models\Movies;
 use Validator;
 
 class MoviesController extends Controller
 {
+    /**
+     * Display a listing of the movies.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
-        $data = Movies::all();
-        $response = [
+        $movies = Movies::all();
+        return response()->json([
             'success' => true,
-            'data' => $data
-        ];
-        return $response;
+            'data' => $movies,
+        ]);
     }
 
+    /**
+     * Store a newly created movie in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'judul' => 'required',
-            'genre' => 'required',
-            'durasi' => 'required',
-            'rating' => 'required',
-            'usia' => 'required',
-            'poster' => 'mimetype:image/jpeg,png,jpg,gif,svg|max:1000|required',
+            'judul' => 'required|string|max:255',
+            'genre' => 'required|string|max:255',
+            'durasi' => 'required|integer',
+            'rating' => 'required|numeric',
+            'usia' => 'required|integer',
+            'poster' => 'mimes:jpeg,png,jpg,gif,svg|max:1000|required',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
 
         $movies = new Movies();
         $movies->judul = $request->judul;
@@ -45,106 +58,129 @@ class MoviesController extends Controller
         $status = $movies->save();
 
         if ($status) {
-            $response = [
+            return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil disimpan',
-            ];
-            return $response;
-        }else{
-            $response = [
+                'message' => 'Movie created successfully',
+                'data' => $movies,
+            ]);
+        } else {
+            return response()->json([
                 'success' => false,
-                'message' => 'Data gagal disimpan',
-            ];
-            return $response;
+                'message' => 'Movie creation failed',
+            ], 500);
         }
     }
 
-    public function show(string $id)
+    /**
+     * Display the specified movie.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
     {
-        $movies = Movies::find($id);
-        $response = [
+        $movie = Movies::find($id);
+
+        if (!$movie) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Movie not found',
+            ], 404);
+        }
+
+        return response()->json([
             'success' => true,
-            'data' => $movies
-        ];
-        return $response;
+            'data' => $movie,
+        ]);
     }
 
-    public function update(Request $request, string $id)
+    /**
+     * Update the specified movie in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'judul' => 'required',
-            'genre' => 'required',
-            'durasi' => 'required',
-            'rating' => 'required',
-            'usia' => 'required',
-            'poster' => 'mimetype:image/jpeg,png,jpg,gif,svg|max:1000|required',
+            'judul' => 'required|string|max:255',
+            'genre' => 'required|string|max:255',
+            'durasi' => 'required|integer',
+            'rating' => 'required|numeric',
+            'usia' => 'required|integer',
+            'poster' => 'mimes:jpeg,png,jpg,gif,svg|max:1000|nullable',
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-        $movies = Movies::where('judul', $id)->first();
-        $movies->judul = $request->judul;
-        $movies->genre = $request->genre;
-        $movies->durasi = $request->durasi;
-        $movies->rating = $request->rating;
-        $movies->usia = $request->usia;
+
+        $movie = Movies::find($id);
+
+        if (!$movie) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Movie not found',
+            ], 404);
+        }
+
+        $movie->judul = $request->judul;
+        $movie->genre = $request->genre;
+        $movie->durasi = $request->durasi;
+        $movie->rating = $request->rating;
+        $movie->usia = $request->usia;
         if ($request->hasFile('poster')) {
             $file = $request->file('poster');
-            $path = public_path('image/' . $movies->poster);
-            if (File::exists($path)) { 
-                File::delete($path);
-            }
-            $filename = $file->getClientOriginalExtension();
-            $file->move(public_path('image'), $filename);
-            $movies->poster = $filename;
+            $filename = time() . '-' . uniqid() . '-' . $file->getClientOriginalName();
+            $file->move(public_path('images'), $filename);
+            $movie->poster = $filename;
         }
-        $status = $movies->save();
+        $status = $movie->save();
 
         if ($status) {
-            $response = [
+            return response()->json([
                 'success' => true,
-                'message' => 'Data berhasil disimpan',
-            ];
-            return $response;
-        }else{
-            $response = [
+                'message' => 'Movie updated successfully',
+                'data' => $movie,
+            ]);
+        } else {
+            return response()->json([
                 'success' => false,
-                'message' => 'Data gagal disimpan',
-            ];
-            return $response;
+                'message' => 'Movie update failed',
+            ], 500);
         }
     }
 
-    public function destroy(string $id)
+    /**
+     * Remove the specified movie from storage.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
     {
-        $movies = Movies::where('judul', $id)->first();
-        $status = $movies->delete();
-        if (!$status){
-            $response = [
-                'status' => false,
-                'message' => 'Data gagal dihapus'
-            ];
-            return $response;
-        }else{
-            $response = [
-                'status' => true,
-                'message' => 'Data berhasil dihapus'
-            ];
-            return $response;
-        }
-    }
+        $movie = Movies::find($id);
 
-    public function showImage (string $filename)
-    {
-        $path = public_path('images/' . $filename);
-        if (!File::exists($path)) {
-            return response()->json(['message' => 'Image not found'], 404);
+        if (!$movie) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Movie not found',
+            ], 404);
         }
-        $file = File::get($path);
-        $type = File::mimeType($path);
-        $response = response($file, 200);
-        $response->header('Content-Type', $type);
-        return $response;
+
+        $status = $movie->delete();
+
+        if ($status) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Movie deleted successfully',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Movie deletion failed',
+            ], 500);
+        }
     }
 }

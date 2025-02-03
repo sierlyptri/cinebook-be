@@ -8,6 +8,11 @@ use Validator;
 
 class TheatersController extends Controller
 {
+    /**
+     * Display a listing of the theaters.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         $data = Theaters::all();
@@ -15,9 +20,15 @@ class TheatersController extends Controller
             'success' => true,
             'data' => $data
         ];
-        return $response;
+        return response()->json($response);
     }
 
+    /**
+     * Store a newly created theater in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -37,16 +48,46 @@ class TheatersController extends Controller
                 'success' => true,
                 'message' => 'Data berhasil disimpan',
             ];
-            return $response;
+            return response()->json($response, 200);
         } else {
             $response = [
                 'success' => false,
                 'message' => 'Data gagal disimpan',
             ];
-            return $response;
+            return response()->json($response, 500);
         }
     }
 
+    /**
+     * Display the specified theater.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show($id)
+    {
+        $theaters = Theaters::find($id);
+
+        if (!$theaters) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Theater not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $theaters,
+        ]);
+    }
+
+    /**
+     * Update the specified theater in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -58,50 +99,61 @@ class TheatersController extends Controller
         }
 
         $theaters = Theaters::find($id);
+
+        if (!$theaters) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Theater not found',
+            ], 404);
+        }
+
         $theaters->nama = $request->nama;
         $status = $theaters->save();
 
         if ($status) {
             $response = [
                 'success' => true,
-                'message' => 'Data berhasil disimpan',
+                'message' => 'Data berhasil diupdate',
             ];
-            return $response;
+            return response()->json($response, 200);
         } else {
             $response = [
                 'success' => false,
-                'message' => 'Data gagal disimpan',
+                'message' => 'Data gagal diupdate',
             ];
-            return $response;
-        }
-    }
-    
-    public function destroy($id)
-    {
-        $theaters = Theaters::find($id);
-        $status = $theaters->delete();
-        if ($status) {
-            $response = [
-                'success' => true,
-                'message' => 'Data berhasil dihapus',
-            ];
-            return $response;
-        } else {
-            $response = [
-                'success' => false,
-                'message' => 'Data gagal dihapus',
-            ];
-            return $response;
+            return response()->json($response, 500);
         }
     }
 
-    public function show($id)
+    /**
+     * Remove the specified theater from storage.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy($id)
     {
         $theaters = Theaters::find($id);
-        $response = [
-            'success' => true,
-            'data' => $theaters
-        ];
-        return $response;
+
+        if (!$theaters) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Theater not found',
+            ], 404);
+        }
+
+        $status = $theaters->delete();
+
+        if ($status) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data gagal dihapus',
+            ], 500);
+        }
     }
 }

@@ -9,6 +9,12 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    /**
+     * Register a new user.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -36,6 +42,12 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Log in a user and create a token.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -59,6 +71,12 @@ class AuthController extends Controller
         ], 401);
     }
 
+    /**
+     * Log out the authenticated user and revoke their token.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete(); 
@@ -68,6 +86,12 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Get the authenticated user's information.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function user(Request $request)
     {
         return response()->json([

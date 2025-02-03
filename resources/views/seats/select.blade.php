@@ -1,12 +1,13 @@
-<!-- filepath: /c:/xampp/htdocs/cinebook-be/resources/views/seats/select.blade.php -->
-
 @extends('layouts.app')
 
 @section('judul', 'Pilih Kursi')
 
 @section('content')
 <div class="container">
+    <!-- Display the movie title and theater name -->
     <h1>{{ $showtime->movies->judul }} - {{ $showtime->theaters->nama }}</h1>
+    
+    <!-- Form to reserve seats -->
     <form method="POST" action="{{ route('seats.store') }}">
         @csrf
         <input type="hidden" name="showtime_id" value="{{ $showtime->id }}">
@@ -21,24 +22,19 @@
         <button type="submit" class="btn btn-primary">Reserve Seats</button>
     </form>
 
+    <!-- Display error message if any -->
     @if(session('error'))
         <div class="alert alert-danger mt-3">
             {{ session('error') }}
         </div>
     @endif
 
+    <!-- Display success message if any -->
     @if(session('success'))
         <div class="alert alert-success mt-3">
             {{ session('success') }}
         </div>
     @endif
-
-    <form method="POST" action="{{ route('seats.book') }}">
-        @csrf
-        <input type="hidden" name="showtime_id" value="{{ $showtime->id }}">
-        <input type="hidden" name="seats_id" value="{{ json_encode($availableSeats->pluck('id')) }}">
-        <button type="submit" class="btn btn-primary mt-3">Proceed to Booking</button>
-    </form>
 </div>
 @endsection
 

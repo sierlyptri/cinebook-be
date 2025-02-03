@@ -8,6 +8,11 @@ use Validator;
 
 class ShowtimesController extends Controller
 {
+    /**
+     * Display a listing of the showtimes.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         $data = Showtimes::all();
@@ -17,6 +22,12 @@ class ShowtimesController extends Controller
         ]);
     }
 
+    /**
+     * Store a newly created showtime in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -50,6 +61,12 @@ class ShowtimesController extends Controller
         }
     }
 
+    /**
+     * Display the specified showtime.
+     *
+     * @param string $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show(string $id)
     {
         $showtimes = Showtimes::find($id);
@@ -57,9 +74,16 @@ class ShowtimesController extends Controller
             'success' => true,
             'data' => $showtimes
         ];
-        return $response;
+        return response()->json($response);
     }
 
+    /**
+     * Update the specified showtime in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(Request $request, string $id)
     {
         $validator = Validator::make($request->all(), [
@@ -101,6 +125,12 @@ class ShowtimesController extends Controller
         }
     }
 
+    /**
+     * Remove the specified showtime from storage.
+     *
+     * @param string $id
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(string $id)
     {
         $showtimes = Showtimes::find($id);

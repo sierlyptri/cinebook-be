@@ -13,31 +13,94 @@ use App\Http\Controllers\BookingController;
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
+|
 */
 
+/**
+ * Authenticated routes
+ */
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
-    Route::get('/user', [App\Http\Controllers\AuthController::class, 'user']);
+    /**
+     * Log out the authenticated user.
+     *
+     * @route POST /logout
+     * @controller AuthController@logout
+     */
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    /**
+     * Get the authenticated user's information.
+     *
+     * @route GET /user
+     * @controller AuthController@user
+     */
+    Route::get('/user', [AuthController::class, 'user']);
 });
 
+/**
+ * Register a new user.
+ *
+ * @route POST /register
+ * @controller AuthController@register
+ */
 Route::post('register', [AuthController::class, 'register']);
+
+/**
+ * Log in a user and create a token.
+ *
+ * @route POST /login
+ * @controller AuthController@login
+ */
 Route::post('login', [AuthController::class, 'login']);
+
+/**
+ * Store a newly created movie in storage.
+ *
+ * @route POST /movies
+ * @controller MoviesController@store
+ */
 Route::post('movies', [MoviesController::class, 'store']);
+
+/**
+ * Display a listing of the movies.
+ *
+ * @route GET /movies
+ * @controller MoviesController@index
+ */
 Route::get('movies', [MoviesController::class, 'index']);
+
+/**
+ * Display the specified movie.
+ *
+ * @route GET /movies/{id}
+ * @controller MoviesController@show
+ */
 Route::get('movies/{id}', [MoviesController::class, 'show']);
+
+/**
+ * Update the specified movie in storage.
+ *
+ * @route PUT /movies/{id}
+ * @controller MoviesController@update
+ */
 Route::put('movies/{id}', [MoviesController::class, 'update']);
+
+/**
+ * Remove the specified movie from storage.
+ *
+ * @route DELETE /movies/{id}
+ * @controller MoviesController@destroy
+ */
 Route::delete('movies/{id}', [MoviesController::class, 'destroy']);
+
+/**
+ * Display the specified image.
+ *
+ * @route GET /showImage/{filename}
+ * @controller MoviesController@showImage
+ */
 Route::get('showImage/{filename}', [MoviesController::class, 'showImage']);
-Route::post('theaters', [TheatersController::class, 'store']);
-Route::get('theaters', [TheatersController::class, 'index']);
-Route::get('theaters/{id}', [TheatersController::class, 'show']);
-Route::put('theaters/{id}', [TheatersController::class, 'update']);
-Route::delete('theaters/{id}', [TheatersController::class, 'destroy']);
-Route::post('showtimes', [ShowtimesController::class, 'store']);
-Route::get('showtimes', [ShowtimesController::class, 'index']);
-Route::get('showtimes/{id}', [ShowtimesController::class, 'show']);
-Route::put('showtimes/{id}', [ShowtimesController::class, 'update']);
-Route::delete('showtimes/{id}', [ShowtimesController::class, 'destroy']);
-Route::get('seats/{showtime}', [SeatsController::class, 'index']);
-Route::post('seats', [SeatsController::class, 'store'])->name('seats.store');
-Route::post('book', [SeatsController::class, 'book'])->name('seats.book');
