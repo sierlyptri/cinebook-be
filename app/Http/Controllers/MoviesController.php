@@ -4,15 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Movies;
-use Validator;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class MoviesController extends Controller
 {
-    /**
-     * Display a listing of the movies.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+    public function __construct()
+    {
+        $this->middleware('admin')->only(['store', 'update', 'destroy']);
+    }
+
     public function index()
     {
         $movies = Movies::all();
@@ -22,21 +23,15 @@ class MoviesController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created movie in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'genre' => 'required|string|max:255',
-            'durasi' => 'required|integer',
-            'rating' => 'required|numeric',
-            'usia' => 'required|integer',
-            'poster' => 'mimes:jpeg,png,jpg,gif,svg|max:1000|required',
+            'durasi' => 'required|string',
+            'rating' => 'required|string',
+            'usia' => 'required|string',
+            'poster' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
         ]);
 
         if ($validator->fails()) {
@@ -49,39 +44,31 @@ class MoviesController extends Controller
         $movies->durasi = $request->durasi;
         $movies->rating = $request->rating;
         $movies->usia = $request->usia;
-        if ($request->hasFile('poster')) {
-            $file = $request->file('poster');
-            $filename = time() . '-' . uniqid() . '-' . $file->getClientOriginalName();
-            $file->move(public_path('images'), $filename);
-            $movies->poster = $filename;
-        }
-        $status = $movies->save();
 
-        if ($status) {
+        if ($request->hasFile('poster')) {
+            $path = $request->file('poster')->store('posters', 'public');
+            $movies->poster = $path;
+        }
+
+        if ($movies->save()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Movie created successfully',
                 'data' => $movies,
             ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Movie creation failed',
-            ], 500);
         }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Movie creation failed',
+        ], 500);
     }
 
-    /**
-     * Display the specified movie.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function show($id)
     {
-        $movie = Movies::find($id);
+        $movies = Movies::find($id);
 
-        if (!$movie) {
+        if (!$movies) {
             return response()->json([
                 'success' => false,
                 'message' => 'Movie not found',
@@ -90,74 +77,59 @@ class MoviesController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $movie,
+            'data' => $movies,
         ]);
     }
 
-    /**
-     * Update the specified movie in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'judul' => 'required|string|max:255',
-            'genre' => 'required|string|max:255',
-            'durasi' => 'required|integer',
-            'rating' => 'required|numeric',
-            'usia' => 'required|integer',
-            'poster' => 'mimes:jpeg,png,jpg,gif,svg|max:1000|nullable',
-        ]);
+        $movies = Movies::find($id);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        $movie = Movies::find($id);
-
-        if (!$movie) {
+        if (!$movies) {
             return response()->json([
                 'success' => false,
                 'message' => 'Movie not found',
             ], 404);
         }
 
-        $movie->judul = $request->judul;
-        $movie->genre = $request->genre;
-        $movie->durasi = $request->durasi;
-        $movie->rating = $request->rating;
-        $movie->usia = $request->usia;
-        if ($request->hasFile('poster')) {
-            $file = $request->file('poster');
-            $filename = time() . '-' . uniqid() . '-' . $file->getClientOriginalName();
-            $file->move(public_path('images'), $filename);
-            $movie->poster = $filename;
-        }
-        $status = $movie->save();
+        $validator = Validator::make($request->all(), [
+            'judul' => 'sometimes|required|string|max:255',
+            'genre' => 'sometimes|required|string|max:255',
+            'durasi' => 'sometimes|required|string',
+            'rating' => 'sometimes|required|string',
+            'usia' => 'sometimes|required|string',
+            'poster' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
+        ]);
 
-        if ($status) {
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $movies->fill($request->except('poster'));
+
+        if ($request->hasFile('poster')) {
+            if ($movies->poster) {
+                Storage::disk('public')->delete($movies->poster);
+            }
+
+            $path = $request->file('poster')->store('posters', 'public');
+            $movies->poster = $path;
+        }
+
+        if ($movies->save()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Movie updated successfully',
-                'data' => $movie,
+                'data' => $movies,
             ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Movie update failed',
-            ], 500);
         }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Movie update failed',
+        ], 500);
     }
 
-    /**
-     * Remove the specified movie from storage.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function destroy($id)
     {
         $movie = Movies::find($id);
@@ -169,18 +141,20 @@ class MoviesController extends Controller
             ], 404);
         }
 
-        $status = $movie->delete();
+        if ($movie->poster) {
+            Storage::disk('public')->delete($movie->poster);
+        }
 
-        if ($status) {
+        if ($movie->delete()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Movie deleted successfully',
             ]);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Movie deletion failed',
-            ], 500);
         }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Movie deletion failed',
+        ], 500);
     }
 }

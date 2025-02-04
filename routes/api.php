@@ -84,10 +84,10 @@ Route::get('movies/{id}', [MoviesController::class, 'show']);
 /**
  * Update the specified movie in storage.
  *
- * @route PUT /movies/{id}
+ * @route patch /movies/{id}
  * @controller MoviesController@update
  */
-Route::put('movies/{id}', [MoviesController::class, 'update']);
+Route::patch('movies/{id}', [MoviesController::class, 'update']);
 
 /**
  * Remove the specified movie from storage.
