@@ -33,12 +33,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     /**
-     * Get the authenticated user's information.
+     * Get the authenticated user's profile.
      *
-     * @route GET /user
-     * @controller AuthController@user
+     * @route GET /profile
+     * @controller AuthController@profile
      */
-    Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/profile', [AuthController::class, 'profile']);
+
+    Route::post('/profile/update', [AuthController::class, 'updateProfile']);
+
+    Route::post('/profile/change-password', [AuthController::class, 'changePassword']);
 });
 
 /**
@@ -55,7 +59,7 @@ Route::post('register', [AuthController::class, 'register']);
  * @route POST /login
  * @controller AuthController@login
  */
-Route::post('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login'])->name('login');
 
 /**
  * Store a newly created movie in storage.

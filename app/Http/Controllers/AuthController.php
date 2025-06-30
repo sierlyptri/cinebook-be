@@ -21,6 +21,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'role' => 'required|in:user,admin',
         ]);
 
         try {
@@ -28,6 +29,7 @@ class AuthController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
+                'role' => $request->role ?? 'user',
             ]);
 
             return response()->json([
@@ -54,23 +56,23 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-
+    
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $token = $user->createToken('authToken')->plainTextToken;
-
+    
             return response()->json([
                 'message' => 'Login successful',
                 'token' => $token,
-                'user' => $user,
+                'user' => $user, // Menyertakan informasi role pengguna
             ]);
         }
-
+    
         return response()->json([
             'message' => 'Invalid credentials',
         ], 401);
     }
-
+    
     /**
      * Log out the authenticated user and revoke their token.
      *
@@ -92,11 +94,61 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function user(Request $request)
+    public function profile(Request $request)
     {
         return response()->json([
             'success' => true,
             'data' => $request->user(),
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $request->user()->id,
+            'phone' => 'nullable|string|max:15',
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully',
+            'data' => [
+                'user' => $user
+            ]
+        ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Current password is incorrect'
+            ], 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Password changed successfully'
         ]);
     }
 }
