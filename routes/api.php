@@ -39,9 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
      * @controller AuthController@profile
      */
     Route::get('/profile', [AuthController::class, 'profile']);
-
     Route::post('/profile/update', [AuthController::class, 'updateProfile']);
-
     Route::post('/profile/change-password', [AuthController::class, 'changePassword']);
 });
 
