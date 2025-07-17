@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('durasi');
             $table->string('rating');
             $table->string('usia');
+            $table->string('harga');
             $table->text('poster');
             $table->timestamps();
         });

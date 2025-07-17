@@ -106,3 +106,93 @@ Route::delete('movies/{id}', [MoviesController::class, 'destroy']);
  * @controller MoviesController@showImage
  */
 Route::get('showImage/{filename}', [MoviesController::class, 'showImage']);
+
+route::get('theaters', [TheatersController::class, 'index']); 
+/**
+ * Store a newly created theater in storage.
+ *
+ * @route POST /theaters
+ * @controller TheatersController@store
+ */
+Route::post('theaters', [TheatersController::class, 'store']);
+
+/**
+ * Display the specified theater.
+ *
+ * @route GET /theaters/{id}
+ * @controller TheatersController@show
+ */
+Route::get('theaters/{id}', [TheatersController::class, 'show']);
+
+/**
+ * Update the specified theater in storage.
+ *
+ * @route patch /theaters/{id}
+ * @controller TheatersController@update
+ */
+Route::patch('theaters/{id}', [TheatersController::class, 'update']);
+
+/**
+ * Remove the specified theater from storage.
+ *
+ * @route DELETE /theaters/{id}
+ * @controller TheatersController@destroy
+ */
+Route::delete('theaters/{id}', [TheatersController::class, 'destroy']);
+
+/**
+ * Display a listing of the showtimes.
+ *
+ * @route GET /showtimes
+ * @controller ShowtimesController@index
+ */
+Route::get('showtimes', [ShowtimesController::class, 'index']);
+
+/**
+ * Store a newly created showtime in storage.
+ *
+ * @route POST /showtimes
+ * @controller ShowtimesController@store
+ */
+Route::post('showtimes', [ShowtimesController::class, 'store']);
+
+/**
+ * Display the specified showtime.
+ *
+ * @route GET /showtimes/{id}
+ * @controller ShowtimesController@show
+ */
+Route::get('showtimes/{id}', [ShowtimesController::class, 'show']);
+
+/**
+ * Update the specified showtime in storage.
+ *
+ * @route PATCH /showtimes/{id}
+ * @controller ShowtimesController@update
+ */
+Route::patch('showtimes/{id}', [ShowtimesController::class, 'update']);
+
+/**
+ * Remove the specified showtime from storage.
+ *
+ * @route DELETE /showtimes/{id}
+ * @controller ShowtimesController@destroy
+ */
+Route::delete('showtimes/{id}', [ShowtimesController::class, 'destroy']);
+
+/**
+ * Display a listing of the seats for a specific showtime.
+ *
+ * @route GET /showtimes/{id}/seats
+ * @controller SeatsController@index
+ */
+Route::get('showtimes/{id}/seats', [SeatsController::class, 'index']);
+
+/**
+ * Reserve seats for a specific showtime.
+ *
+ * @route POST /showtimes/{id}/seats
+ * @controller SeatsController@store
+ */
+Route::post('showtimes/{id}/seats', [SeatsController::class, 'store']);
+

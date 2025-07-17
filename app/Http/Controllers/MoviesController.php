@@ -6,14 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Movies;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class MoviesController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('admin')->only(['store', 'update', 'destroy']);
-    }
-
     public function index()
     {
         $movies = Movies::all();
@@ -31,6 +27,7 @@ class MoviesController extends Controller
             'durasi' => 'required|string',
             'rating' => 'required|string',
             'usia' => 'required|string',
+            'harga' => 'required|string',
             'poster' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
         ]);
 
@@ -44,6 +41,7 @@ class MoviesController extends Controller
         $movies->durasi = $request->durasi;
         $movies->rating = $request->rating;
         $movies->usia = $request->usia;
+        $movies->harga = $request->harga;
 
         if ($request->hasFile('poster')) {
             $path = $request->file('poster')->store('posters', 'public');
@@ -64,23 +62,6 @@ class MoviesController extends Controller
         ], 500);
     }
 
-    public function show($id)
-    {
-        $movies = Movies::find($id);
-
-        if (!$movies) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Movie not found',
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $movies,
-        ]);
-    }
-
     public function update(Request $request, $id)
     {
         $movies = Movies::find($id);
@@ -98,6 +79,7 @@ class MoviesController extends Controller
             'durasi' => 'sometimes|required|string',
             'rating' => 'sometimes|required|string',
             'usia' => 'sometimes|required|string',
+            'harga' => 'sometimes|required|string',
             'poster' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
         ]);
 
@@ -156,5 +138,18 @@ class MoviesController extends Controller
             'success' => false,
             'message' => 'Movie deletion failed',
         ], 500);
+    }
+
+    public function showImage (string $filename)
+    {
+        $path = public_path('images/' . $filename);
+        if (!File::exists($path)) {
+            return response()->json(['message' => 'Image not found'], 404);
+        }
+        $file = File::get($path);
+        $type = File::mimeType($path);
+        $response = response($file, 200);
+        $response->header('Content-Type', $type);
+        return $response;
     }
 }

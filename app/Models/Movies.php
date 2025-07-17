@@ -44,6 +44,7 @@ class Movies extends Model
         'durasi',
         'rating',
         'usia',
+        'harga',
         'poster'
     ];
 
