@@ -119,62 +119,164 @@ POST /api/login                       - Login pengguna
 POST /api/logout                      - Logout pengguna (Auth required)
 ```
 
-### Endpoint Profil Pengguna
-```
-GET  /api/profile                     - Ambil profil pengguna (Auth required)
-POST /api/profile/update              - Update profil pengguna (Auth required)
-POST /api/profile/change-password     - Ubah password pengguna (Auth required)
-```
-
 ### Endpoint Film
 ```
 GET    /api/movies                    - Ambil semua film
-GET    /api/movies/{id}               - Ambil detail film berdasarkan ID
 POST   /api/movies                    - Tambah film baru
-PATCH  /api/movies/{id}               - Update film berdasarkan ID
+PUT    /api/movies/{id}               - Update film berdasarkan ID
 DELETE /api/movies/{id}               - Hapus film berdasarkan ID
+GET    /api/movies/image/{id}         - Tampilkan poster film berdasarkan ID
 ```
 
 ### Endpoint Teater
 ```
 GET    /api/theaters                  - Ambil semua teater
-GET    /api/theaters/{id}             - Ambil detail teater berdasarkan ID
 POST   /api/theaters                  - Tambah teater baru
-PATCH  /api/theaters/{id}             - Update teater berdasarkan ID
+PUT    /api/theaters/{id}             - Update teater berdasarkan ID
 DELETE /api/theaters/{id}             - Hapus teater berdasarkan ID
 ```
 
 ### Endpoint Jadwal Tayang
 ```
 GET    /api/showtimes                 - Ambil semua jadwal tayang
-GET    /api/showtimes/{id}            - Ambil detail jadwal tayang berdasarkan ID
 POST   /api/showtimes                 - Tambah jadwal tayang baru
-PATCH  /api/showtimes/{id}            - Update jadwal tayang berdasarkan ID
+PUT    /api/showtimes/{id}            - Update jadwal tayang berdasarkan ID
 DELETE /api/showtimes/{id}            - Hapus jadwal tayang berdasarkan ID
 ```
 
 ### Endpoint Kursi
 ```
-GET    /api/seats                     - Ambil semua kursi
-GET    /api/seats/{id}                - Ambil detail kursi berdasarkan ID
-POST   /api/seats                     - Tambah kursi baru
-PATCH  /api/seats/{id}                - Update kursi berdasarkan ID
-DELETE /api/seats/{id}                - Hapus kursi berdasarkan ID
-GET    /api/theaters/{id}/seats       - Ambil kursi berdasarkan teater
+GET    /api/seats                     - Ambil kursi berdasarkan showtime_id
+POST   /api/seats                     - Tambah/update layout kursi teater
 ```
 
 ### Endpoint Pemesanan
 ```
-GET    /api/bookings                  - Ambil semua pemesanan
-GET    /api/bookings/{id}             - Ambil detail pemesanan berdasarkan ID
-POST   /api/bookings                  - Buat pemesanan baru
-PATCH  /api/bookings/{id}             - Update pemesanan berdasarkan ID
-DELETE /api/bookings/{id}             - Batalkan pemesanan berdasarkan ID
+GET    /api/bookings                  - Ambil semua pemesanan user (Auth required)
+POST   /api/bookings                  - Buat pemesanan baru (Auth required)
+GET    /api/bookings/{id}             - Ambil detail pemesanan berdasarkan ID (Auth required)
+DELETE /api/bookings/{id}             - Batalkan pemesanan berdasarkan ID (Auth required)
 ```
 
-### Endpoint Media
+---
+
+## Error Responses
+
+### Standard Error Format
+```json
+{
+    "message": "Error description",
+    "errors": {
+        "field_name": [
+            "Specific validation error"
+        ]
+    }
+}
 ```
-GET    /api/showImage/{filename}      - Tampilkan gambar berdasarkan filename
+
+### Common HTTP Status Codes
+- `200`: Success
+- `201`: Created
+- `204`: No Content
+- `400`: Bad Request
+- `401`: Unauthorized
+- `403`: Forbidden
+- `404`: Not Found
+- `422`: Unprocessable Entity (Validation Error)
+- `500`: Internal Server Error
+
+### Authentication Errors
+- `401`: Missing or invalid token
+- `403`: Token expired or user doesn't have permission
+
+### Validation Errors
+- `422`: Request validation failed
+- Includes detailed field-specific error messages
+
+---
+
+## Rate Limiting
+
+- **General endpoints**: 60 requests per minute per IP
+- **Authentication endpoints**: 5 requests per minute per IP
+- **Booking endpoints**: 10 requests per minute per user
+
+---
+
+## Development Requirements
+
+### Environment Setup
+```bash
+# Install dependencies
+composer install
+npm install
+
+# Environment configuration
+cp .env.example .env
+php artisan key:generate
+
+# Database setup
+php artisan migrate
+php artisan db:seed
+
+# Storage setup
+php artisan storage:link
+
+# Sanctum setup
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+```
+
+### Required Packages
+- Laravel 8+
+- Laravel Sanctum
+- Laravel Validation
+- Intervention Image (for poster uploads)
+
+### Database Requirements
+- MySQL 5.7+ or PostgreSQL 10+
+- Proper foreign key constraints
+- Indexes on frequently queried columns
+
+### File Storage
+- Public disk for movie posters
+- Proper file permissions
+- Image optimization recommended
+
+### Security Considerations
+- HTTPS in production
+- CORS properly configured
+- Rate limiting enabled
+- Input sanitization
+- SQL injection protection (use Eloquent ORM)
+
+---
+
+## Testing
+
+### API Testing
+Use tools like Postman, Insomnia, or cURL for testing endpoints.
+
+### Example cURL Requests
+
+**Register:**
+```bash
+curl -X POST localhost:8000/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"John Doe","email":"john@example.com","password":"password123","password_confirmation":"password123"}'
+```
+
+**Get Movies:**
+```bash
+curl -X GET localhost:8000/api/movies \
+  -H "Accept: application/json"
+```
+
+**Create Booking:**
+```bash
+curl -X POST localhost:8000/api/bookings \
+  -H "Authorization: Bearer your-token" \
+  -H "Content-Type: application/json" \
+  -d '{"showtime_id":1,"seat_ids":[1,2]}'
 ```
 
 ## 🗄️ Skema Database
