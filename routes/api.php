@@ -34,7 +34,7 @@ Route::get('/movies', [MoviesController::class, 'index']);
 Route::post('/movies', [MoviesController::class, 'store']);
 Route::put('/movies/{id}', [MoviesController::class, 'update']);
 Route::delete('/movies/{id}', [MoviesController::class, 'destroy']);
-Route::get('/movies/image/{id}', [MoviesController::class, 'showImage']);
+Route::get('/movies/images/{filename}', [MoviesController::class, 'showImage']);
 
 Route::get('/theaters', [TheatersController::class, 'index']);
 Route::post('/theaters', [TheatersController::class, 'store']);
