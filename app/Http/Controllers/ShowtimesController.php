@@ -15,7 +15,7 @@ class ShowtimesController extends Controller
      */
     public function index()
     {
-        $data = Showtimes::all();
+        $data = Showtimes::with(['movie', 'theater'])->get();
         return response()->json([
             'success' => true,
             'data' => $data
@@ -69,7 +69,13 @@ class ShowtimesController extends Controller
      */
     public function show(string $id)
     {
-        $showtimes = Showtimes::find($id);
+        $showtimes = Showtimes::with(['movie', 'theater'])->find($id);
+        if (!$showtimes) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan',
+            ], 404);
+        }
         $response = [
             'success' => true,
             'data' => $showtimes

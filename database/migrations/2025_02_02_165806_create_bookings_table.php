@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('showtimes_id')->constrained('showtimes')->onDelete('cascade'); // Corrected column name
-            $table->json('seats_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('showtimes_id')->constrained('showtimes')->onDelete('cascade');
+            $table->json('seats');
             $table->integer('total_price');
             $table->string('payment_status')->default('pending');
+            $table->string('booking_code')->unique();
             $table->timestamps();
         });
     }

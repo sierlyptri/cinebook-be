@@ -46,12 +46,15 @@ class Bookings extends Model
 
     protected $fillable = [
         'user_id',
-        'movie_id',
-        'theater_id',
         'showtimes_id',
-        'seats_id',
+        'seats',
         'total_price',
         'payment_status',
+        'booking_code',
+    ];
+
+    protected $casts = [
+        'seats' => 'array',
     ];
 
     /**
@@ -63,34 +66,10 @@ class Bookings extends Model
     }
 
     /**
-     * Get the movie associated with the booking.
-     */
-    public function movie()
-    {
-        return $this->belongsTo(Movies::class);
-    }
-
-    /**
-     * Get the theater associated with the booking.
-     */
-    public function theater()
-    {
-        return $this->belongsTo(Theaters::class);
-    }
-
-    /**
      * Get the showtime associated with the booking.
      */
     public function showtimes()
     {
         return $this->belongsTo(Showtimes::class);
-    }
-
-    /**
-     * Get the seats associated with the booking.
-     */
-    public function seats()
-    {
-        return $this->belongsToMany(Seats::class, 'booking_seat');
     }
 }

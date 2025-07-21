@@ -64,4 +64,9 @@ class Showtimes extends Model
     {
         return $this->hasMany(Seats::class);
     }
+
+    public function bookings()
+    {
+        return $this->hasMany(Bookings::class);
+    }
 }
