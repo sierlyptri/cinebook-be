@@ -7,7 +7,7 @@ use App\Http\Controllers\MoviesController;
 use App\Http\Controllers\TheatersController;
 use App\Http\Controllers\ShowtimesController;
 use App\Http\Controllers\SeatsController;
-use App\Http\Controllers\BookingController;
+use App\Http\Controllers\BookingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,176 +23,35 @@ use App\Http\Controllers\BookingController;
 /**
  * Authenticated routes
  */
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
-    /**
-     * Log out the authenticated user.
-     *
-     * @route POST /logout
-     * @controller AuthController@logout
-     */
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    /**
-     * Get the authenticated user's profile.
-     *
-     * @route GET /profile
-     * @controller AuthController@profile
-     */
-    Route::get('/profile', [AuthController::class, 'profile']);
-    Route::post('/profile/update', [AuthController::class, 'updateProfile']);
-    Route::post('/profile/change-password', [AuthController::class, 'changePassword']);
+    Route::get('/user', [AuthController::class, 'user']);
 });
 
-/**
- * Register a new user.
- *
- * @route POST /register
- * @controller AuthController@register
- */
-Route::post('register', [AuthController::class, 'register']);
+Route::get('/movies', [MoviesController::class, 'index']);
+Route::post('/movies', [MoviesController::class, 'store']);
+Route::put('/movies/{id}', [MoviesController::class, 'update']);
+Route::delete('/movies/{id}', [MoviesController::class, 'destroy']);
+Route::get('/movies/image/{id}', [MoviesController::class, 'showImage']);
 
-/**
- * Log in a user and create a token.
- *
- * @route POST /login
- * @controller AuthController@login
- */
-Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::get('/theaters', [TheatersController::class, 'index']);
+Route::post('/theaters', [TheatersController::class, 'store']);
+Route::put('/theaters/{id}', [TheatersController::class, 'update']);
+Route::delete('/theaters/{id}', [TheatersController::class, 'destroy']);
 
-/**
- * Store a newly created movie in storage.
- *
- * @route POST /movies
- * @controller MoviesController@store
- */
-Route::post('movies', [MoviesController::class, 'store']);
+Route::get('/showtimes', [ShowtimesController::class, 'index']);
+Route::post('/showtimes', [ShowtimesController::class, 'store']);
+Route::put('/showtimes/{id}', [ShowtimesController::class, 'update']);
+Route::delete('/showtimes/{id}', [ShowtimesController::class, 'destroy']);
 
-/**
- * Display a listing of the movies.
- *
- * @route GET /movies
- * @controller MoviesController@index
- */
-Route::get('movies', [MoviesController::class, 'index']);
+Route::get('/seats', [SeatsController::class, 'index']);
+Route::post('/seats', [SeatsController::class, 'store']);
 
-/**
- * Display the specified movie.
- *
- * @route GET /movies/{id}
- * @controller MoviesController@show
- */
-Route::get('movies/{id}', [MoviesController::class, 'show']);
-
-/**
- * Update the specified movie in storage.
- *
- * @route patch /movies/{id}
- * @controller MoviesController@update
- */
-Route::patch('movies/{id}', [MoviesController::class, 'update']);
-
-/**
- * Remove the specified movie from storage.
- *
- * @route DELETE /movies/{id}
- * @controller MoviesController@destroy
- */
-Route::delete('movies/{id}', [MoviesController::class, 'destroy']);
-
-/**
- * Display the specified image.
- *
- * @route GET /showImage/{filename}
- * @controller MoviesController@showImage
- */
-Route::get('showImage/{filename}', [MoviesController::class, 'showImage']);
-
-route::get('theaters', [TheatersController::class, 'index']); 
-/**
- * Store a newly created theater in storage.
- *
- * @route POST /theaters
- * @controller TheatersController@store
- */
-Route::post('theaters', [TheatersController::class, 'store']);
-
-/**
- * Display the specified theater.
- *
- * @route GET /theaters/{id}
- * @controller TheatersController@show
- */
-Route::get('theaters/{id}', [TheatersController::class, 'show']);
-
-/**
- * Update the specified theater in storage.
- *
- * @route patch /theaters/{id}
- * @controller TheatersController@update
- */
-Route::patch('theaters/{id}', [TheatersController::class, 'update']);
-
-/**
- * Remove the specified theater from storage.
- *
- * @route DELETE /theaters/{id}
- * @controller TheatersController@destroy
- */
-Route::delete('theaters/{id}', [TheatersController::class, 'destroy']);
-
-/**
- * Display a listing of the showtimes.
- *
- * @route GET /showtimes
- * @controller ShowtimesController@index
- */
-Route::get('showtimes', [ShowtimesController::class, 'index']);
-
-/**
- * Store a newly created showtime in storage.
- *
- * @route POST /showtimes
- * @controller ShowtimesController@store
- */
-Route::post('showtimes', [ShowtimesController::class, 'store']);
-
-/**
- * Display the specified showtime.
- *
- * @route GET /showtimes/{id}
- * @controller ShowtimesController@show
- */
-Route::get('showtimes/{id}', [ShowtimesController::class, 'show']);
-
-/**
- * Update the specified showtime in storage.
- *
- * @route PATCH /showtimes/{id}
- * @controller ShowtimesController@update
- */
-Route::patch('showtimes/{id}', [ShowtimesController::class, 'update']);
-
-/**
- * Remove the specified showtime from storage.
- *
- * @route DELETE /showtimes/{id}
- * @controller ShowtimesController@destroy
- */
-Route::delete('showtimes/{id}', [ShowtimesController::class, 'destroy']);
-
-/**
- * Display a listing of the seats for a specific showtime.
- *
- * @route GET /showtimes/{id}/seats
- * @controller SeatsController@index
- */
-Route::get('showtimes/{id}/seats', [SeatsController::class, 'index']);
-
-/**
- * Reserve seats for a specific showtime.
- *
- * @route POST /showtimes/{id}/seats
- * @controller SeatsController@store
- */
-Route::post('showtimes/{id}/seats', [SeatsController::class, 'store']);
-
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/bookings', [BookingsController::class, 'index']);
+    Route::post('/bookings', [BookingsController::class, 'store']);
+    Route::get('/bookings/{id}', [BookingsController::class, 'show']);
+    Route::delete('/bookings/{id}', [BookingsController::class, 'destroy']);
+});
