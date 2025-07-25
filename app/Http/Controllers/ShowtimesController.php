@@ -15,7 +15,7 @@ class ShowtimesController extends Controller
      */
     public function index()
     {
-        $data = Showtimes::with(['movie', 'theater'])->get();
+        $data = Showtimes::with(['movies', 'theaters'])->get();
         return response()->json([
             'success' => true,
             'data' => $data
