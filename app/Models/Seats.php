@@ -35,7 +35,7 @@ class Seats extends Model
 
     protected $fillable = [
         'showtimes_id',
-        'seat_number',
+        'nomor_kursi',
         'status',
     ];
 

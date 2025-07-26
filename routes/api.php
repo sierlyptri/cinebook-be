@@ -46,7 +46,7 @@ Route::post('/showtimes', [ShowtimesController::class, 'store']);
 Route::put('/showtimes/{id}', [ShowtimesController::class, 'update']);
 Route::delete('/showtimes/{id}', [ShowtimesController::class, 'destroy']);
 
-Route::get('/seats', [SeatsController::class, 'index']);
+Route::get('/seats/{showtimes_id}', [SeatsController::class, 'index']);
 Route::post('/seats', [SeatsController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {

@@ -24,10 +24,11 @@ class SeatsController extends Controller
         $availableSeats = $showtime->seats()->where('status', 'kosong')->get();
 
         return response()->json([
-            'showtime' => $showtime->movies->judul ?? 'N/A',
-            'theater' => $showtime->theaters->nama ?? 'N/A',
+            'showtimes_id' => $showtime->id,
+            'movies' => $showtime->movies->judul ?? 'N/A',
+            'theaters' => $showtime->theaters->nama ?? 'N/A',
             'available_seats' => $availableSeats
-        ]);
+        ], 200);
     }
 
     /**
