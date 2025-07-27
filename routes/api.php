@@ -55,3 +55,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookings/{id}', [BookingsController::class, 'show']);
     Route::delete('/bookings/{id}', [BookingsController::class, 'destroy']);
 });
+
+Route::post('/midtrans/callback', [BookingsController::class, 'midtransCallback']);

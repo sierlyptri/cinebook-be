@@ -13,17 +13,12 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('users_id')->constrained()->onDelete('cascade');
-            $table->foreignId('showtimes_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('showtimes_id')->constrained('showtimes')->onDelete('cascade');
             $table->json('seats');
             $table->integer('total_price');
-
-            // MIDTRANS RELATED
-            $table->string('bookings_code')->unique();       // internal booking reference
-            $table->string('order_id')->unique()->nullable(); // Midtrans order_id
-            $table->string('payment_status')->default('pending'); // pending / success / failed
-            $table->timestamp('paid_at')->nullable();       // waktu pembayaran sukses
-
+            $table->string('payment_status')->default('pending');
+            $table->string('booking_code')->unique();
             $table->timestamps();
         });
     }
