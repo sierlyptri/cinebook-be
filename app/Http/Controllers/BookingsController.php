@@ -52,8 +52,8 @@ class BookingsController extends Controller
                 return response()->json(['message' => 'Some selected seats are already reserved'], 422);
             }
 
-            // Hitung total harga, misal per kursi 40.000
-            $totalPrice = count($seatsId) * 40000;
+            // Hitung total harga, misal per kursi 50.000
+            $totalPrice = count($seatsId) * 50000;
 
             $booking = Bookings::create([
                 'user_id' => auth()->id(), // atau $request->user_id
@@ -121,5 +121,24 @@ class BookingsController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'Failed to cancel booking'], 500);
         }
+    }
+
+    /**
+     * Batalkan booking berdasarkan kode booking.
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:pending,success,failed,cancelled',
+        ]);
+
+        $booking = Bookings::findOrFail($id);
+        $booking->payment_status = $request->payment_status;
+        $booking->save();
+
+        return response()->json([
+            'message' => 'Booking status updated successfully',
+            'data' => $booking
+        ], 200);
     }
 }

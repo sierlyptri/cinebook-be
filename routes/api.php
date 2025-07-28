@@ -8,6 +8,7 @@ use App\Http\Controllers\TheatersController;
 use App\Http\Controllers\ShowtimesController;
 use App\Http\Controllers\SeatsController;
 use App\Http\Controllers\BookingsController;
+use App\Http\Controllers\PaymentsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,11 +50,11 @@ Route::delete('/showtimes/{id}', [ShowtimesController::class, 'destroy']);
 Route::get('/seats/{showtimes_id}', [SeatsController::class, 'index']);
 Route::post('/seats', [SeatsController::class, 'store']);
 
+Route::put('/bookings/{id}/status', [BookingsController::class, 'updateStatus']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bookings', [BookingsController::class, 'index']);
     Route::post('/bookings', [BookingsController::class, 'store']);
     Route::get('/bookings/{id}', [BookingsController::class, 'show']);
     Route::delete('/bookings/{id}', [BookingsController::class, 'destroy']);
 });
-
-Route::post('/midtrans/callback', [BookingsController::class, 'midtransCallback']);
