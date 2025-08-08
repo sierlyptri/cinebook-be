@@ -8,7 +8,7 @@ use App\Http\Controllers\TheatersController;
 use App\Http\Controllers\ShowtimesController;
 use App\Http\Controllers\SeatsController;
 use App\Http\Controllers\BookingsController;
-use App\Http\Controllers\PaymentsController;
+use App\Http\Controllers\SupervisorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +50,7 @@ Route::delete('/showtimes/{id}', [ShowtimesController::class, 'destroy']);
 Route::get('/seats/{showtimes_id}', [SeatsController::class, 'index']);
 Route::post('/seats', [SeatsController::class, 'store']);
 
+Route::get('/bookings', [BookingsController::class, 'index']);
 Route::put('/bookings/{id}/status', [BookingsController::class, 'updateStatus']);
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -57,4 +58,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings', [BookingsController::class, 'store']);
     Route::get('/bookings/{id}', [BookingsController::class, 'show']);
     Route::delete('/bookings/{id}', [BookingsController::class, 'destroy']);
+    Route::get('/supervisor', [SupervisorController::class, 'index']);
 });
